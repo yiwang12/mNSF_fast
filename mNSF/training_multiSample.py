@@ -25,7 +25,7 @@ from os import path
 import gc
 import matplotlib.pyplot as plt
 from mNSF.NSF.misc import mkdir_p, pickle_to_file, unpickle_from_file, rpad
-from mNSF.NSF import training,visualize
+from mNSF import training,visualize
 
 # Import TensorFlow Probability for transformed variables and bijectors
 # These are used for constrained optimization and parameter transformations

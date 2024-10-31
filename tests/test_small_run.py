@@ -1,4 +1,4 @@
-import pickle
+cholimport pickle
 import random
 from pathlib import Path
 
@@ -37,7 +37,7 @@ def _run(
         D[ksample]["Z"] = D_tmp["X"][random.sample(range(0, D_tmp["X"].shape[0] - 1), ninduced), :]
 
     # step 1 initialize model
-    fit = process_multiSample.ini_multiSample(D, n_loadings, "nb", chol=False)
+    fit = process_multiSample.ini_multiSample(D, n_loadings, "nb", chol=True)
 
     # step 2 fit model
 

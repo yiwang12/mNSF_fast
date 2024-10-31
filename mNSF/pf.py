@@ -351,21 +351,15 @@ class ProcessFactorization(tf.Module):
     return J*tf.reduce_mean(eloglik) - kl_term/Ntot
 
 
-
-  def train_step(self, list_self, list_D, optimizer, optimizer_k, S=1, Ntot=None, chol=True, chunk_size=1):
+  def train_step(self, D, optimizer, optimizer_k, S=1, Ntot=None, chol=True, chunk_size=1):
     """
     Executes one training step and returns the loss.
     D is training data: a tensorflow dataset (from slices) of (X,Y,sz)
     This function computes the loss and gradients, and uses the latter to
     update the model's parameters.
     """
-    kk=0
-    for self_tmp in list_self:
-      kk=kk+1
-    list_D=[None]*kk
-    list_Y=[None]*kk
     with tf.GradientTape(persistent=True) as tape:
-      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol, chunk_size = chunk_size)
+      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol, chunk_size = chunk_size))
     try:
       gradients = tape.gradient(loss, self.trvars_nonkernel)
       if chol:
@@ -375,6 +369,7 @@ class ProcessFactorization(tf.Module):
     finally:
       del tape
     return loss
+
 
   def validation_step(self, D, S=1, chol=False):
     """

@@ -227,8 +227,21 @@ class ProcessFactorization_multiSample(tf.Module):
 
   def get_mu_z(self):
     return self.beta0+tfl.matmul(self.beta, self.Z, transpose_b=True) #LxM
-
-  def sample_latent_GP_funcs(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
+  
+  def sample_latent_GP_funcs(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True, chunk_size=1):
+    N = X.shape[0]
+    results = []
+    
+    for start_idx in range(0, N, chunk_size):
+        end_idx = min(start_idx + chunk_size, N)
+        X_chunk = X[start_idx:end_idx]
+        
+        # Process smaller chunk
+        chunk_result = self.sample_latent_GP_funcs_onechunk(X_chunk,S=S,kernel=kernel,mu_z=mu_z,Kuu_chol=Kuu_chol,chol=chol)
+        results.append(chunk_result)
+      
+  
+  def sample_latent_GP_funcs_onechunk(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
     """
     Draw random samples of the latent variational GP function values "F"
     based on spatial coordinates X.
@@ -279,14 +292,14 @@ class ProcessFactorization_multiSample(tf.Module):
     eps = tf.random.normal((S,L,N)) #note this is not the same random generator as self.rng!
     return mu_tilde + tf.math.sqrt(Sigma_tilde)*eps #"F", dims: SxLxN
 
-  def sample_predictive_mean(self, X, sz=1, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
+  def sample_predictive_mean(self, X, sz=1, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True, chunk_size=1):
     """
     See sample_latent_variational_GP_funcs for X,S definitions
     sz is a tensor of shape (N,1) of size factors.
     Typically sz would be the rowSums or rowMeans of the outcome matrix Y.
     """
     F = self.sample_latent_GP_funcs(X, S=S, kernel=kernel, mu_z=mu_z,
-                                    Kuu_chol=Kuu_chol, chol=chol) #SxLxN
+                                    Kuu_chol=Kuu_chol, chol=chol, chunk_size=chunk_size) #SxLxN
     if self.nonneg:
       Lam = tfl.matrix_transpose(tfl.matmul(self.W, tf.exp(F))) #SxNxJ
       if self.lik=="gau":
@@ -317,7 +330,7 @@ class ProcessFactorization_multiSample(tf.Module):
     return qu.kl_divergence(pu) #L-vector
 
   # @tf.function
-  def elbo_avg(self, X, Y, sz=1, S=1, Ntot=None, chol=True):
+  def elbo_avg(self, X, Y, sz=1, S=1, Ntot=None, chol=True, chunksize=1):
     """
     Parameters
     ----------
@@ -351,7 +364,7 @@ class ProcessFactorization_multiSample(tf.Module):
     #kl_terms is not affected by minibatching so use reduce_sum
     #print(1111)
     kl_term = tf.reduce_sum(self.eval_kl_term(mu_z, Kuu_chol))
-    Mu = self.sample_predictive_mean(X, sz=sz, S=S, kernel=ker, mu_z=mu_z, Kuu_chol=Kuu_chol, chol = chol)
+    Mu = self.sample_predictive_mean(X, sz=sz, S=S, kernel=ker, mu_z=mu_z, Kuu_chol=Kuu_chol, chol = chol, chunksize = chunksize)
     eloglik = likelihoods.lik_to_distr(self.lik, Mu, self.disp).log_prob(Y)
     return J*tf.reduce_mean(eloglik) - kl_term/Ntot
 

@@ -359,7 +359,7 @@ class ProcessFactorization(tf.Module):
     update the model's parameters.
     """
     with tf.GradientTape(persistent=True) as tape:
-      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol, chunk_size = chunk_size))
+      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol, chunk_size = chunk_size)
     try:
       gradients = tape.gradient(loss, self.trvars_nonkernel)
       if chol:

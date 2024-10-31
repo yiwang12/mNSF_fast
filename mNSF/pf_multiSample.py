@@ -408,7 +408,7 @@ class ProcessFactorization_multiSample(tf.Module):
 
 
 
-  def train_step(self, list_self, list_D, optimizer, optimizer_k, S=1, Ntot=None, chol=True):
+  def train_step(self, list_self, list_D, optimizer, optimizer_k, S=1, Ntot=None, chol=True, chunk_size=1):
     """
     Executes one training step and returns the loss.
     D is training data: a tensorflow dataset (from slices) of (X,Y,sz)
@@ -421,7 +421,7 @@ class ProcessFactorization_multiSample(tf.Module):
     list_D=[None]*kk
     list_Y=[None]*kk
     with tf.GradientTape(persistent=True) as tape:
-      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol)
+      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol, chunk_size = chunk_size)
     try:
       gradients = tape.gradient(loss, self.trvars_nonkernel)
       if chol:

@@ -209,7 +209,7 @@ class ProcessFactorization(tf.Module):
         print("chunk_result.shape")
         print(chunk_result.shape)
         results.append(chunk_result)
-    return tf.concat(results, axis=0)
+    return tf.concat(results, axis=3)
   
   def sample_latent_GP_funcs_onechunk(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
     """

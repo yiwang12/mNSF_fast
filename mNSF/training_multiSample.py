@@ -44,7 +44,7 @@ def save_object(obj, filename):
 
 # Main function to train mNSF model
 def train_model_mNSF(list_fit_,pickle_path_,
-            list_Dtrain_,list_D_,legacy=False,test_cvdNorm=False, maxtry=10, lr=0.01, **kwargs):
+            list_Dtrain_,list_D_,legacy=False,test_cvdNorm=False, maxtry=10, lr=0.01,chunk_size=1, **kwargs):
   """
     Run model training for mNSF across multiple samples.
     
@@ -72,7 +72,7 @@ def train_model_mNSF(list_fit_,pickle_path_,
     list_tro.append(tro_tmp)
   # Train the model using the main ModelTrainer object
   tro_.train_model(list_tro,
-            list_Dtrain_,list_D_, test_cvdNorm=test_cvdNorm,maxtry=maxtry, **kwargs)
+            list_Dtrain_,list_D_, test_cvdNorm=test_cvdNorm,maxtry=maxtry, chunk_size=chunk_size, **kwargs)
   
   # automatically create and save loss plot
   # included here to avoid changing analysis scripts, might want to change later

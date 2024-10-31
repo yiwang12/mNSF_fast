@@ -312,7 +312,7 @@ class ProcessFactorization(tf.Module):
     return qu.kl_divergence(pu) #L-vector
 
   # @tf.function
-  def elbo_avg(self, X, Y, sz=1, S=1, Ntot=None, chol=True, chunksize=1):
+  def elbo_avg(self, X, Y, sz=1, S=1, Ntot=None, chol=True, chunk_size=1):
     """
     Parameters
     ----------
@@ -346,7 +346,7 @@ class ProcessFactorization(tf.Module):
     #kl_terms is not affected by minibatching so use reduce_sum
     #print(1111)
     kl_term = tf.reduce_sum(self.eval_kl_term(mu_z, Kuu_chol))
-    Mu = self.sample_predictive_mean(X, sz=sz, S=S, kernel=ker, mu_z=mu_z, Kuu_chol=Kuu_chol, chol = chol, chunksize = chunksize)
+    Mu = self.sample_predictive_mean(X, sz=sz, S=S, kernel=ker, mu_z=mu_z, Kuu_chol=Kuu_chol, chol = chol, chunk_size = chunk_size)
     eloglik = likelihoods.lik_to_distr(self.lik, Mu, self.disp).log_prob(Y)
     return J*tf.reduce_mean(eloglik) - kl_term/Ntot
 

@@ -28,8 +28,8 @@ For more information on the mNSF method, please refer to the accompanying public
 
 # Import necessary libraries
 from tensorflow_probability import math as tm
-from mNSF import pf_multiSample,training_multiSample
-from mNSF.NSF import misc,pf,preprocess,postprocess
+from mNSF import pf_multiSample,training_multiSample,pf
+from mNSF.NSF import misc,preprocess,postprocess
 from anndata import AnnData
 from scanpy import pp
 import numpy as np

@@ -221,7 +221,7 @@ class ProcessFactorization(tf.Module):
         # Process smaller chunk
         chunk_result = self.sample_latent_GP_funcs_onechunk(X_chunk,S=S,kernel=kernel,mu_z=mu_z,Kuu_chol=Kuu_chol,chol=chol)
         results.append(chunk_result)
-      
+    return results
   
   def sample_latent_GP_funcs_onechunk(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
     """

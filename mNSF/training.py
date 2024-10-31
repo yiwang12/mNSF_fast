@@ -184,7 +184,7 @@ class ModelTrainer(object): #goal to change this to tf.module?
                            verbose=True, num_epochs=5000,
                            ptic = process_time(), wtic = time(), ckpt_freq=50,
                            kernel_hp_update_freq=10, status_freq=10,
-                           span=100, tol=5e-5, pickle_freq=None, check_convergence=True chunk_size=1):
+                           span=100, tol=5e-5, pickle_freq=None, check_convergence=True, chunk_size=1):
     """
     Dtrain, Dval : tensorflow Datasets produced by prepare_datasets_tf func
     ckpt_mgr must store at least 2 checkpoints (max_to_keep)

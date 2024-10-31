@@ -38,7 +38,8 @@ def _run(
 
     # step 1 initialize model
     fit = process_multiSample.ini_multiSample(D, n_loadings, "nb", chol=True)
-
+    print("fit[0].W")
+    print(fit[0].W)
     # step 2 fit model
 
     (pp := (output_dir / "models" / "pp")).mkdir(parents=True, exist_ok=True)

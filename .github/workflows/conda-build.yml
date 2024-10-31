@@ -1,0 +1,55 @@
+name: Conda build and test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+  release:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Conda environment
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          cache-downloads: true
+          cache-environment: true
+          environment-file: environment.yml
+          environment-name: mnsf
+          init-shell: >-
+            bash
+
+      - name: Install & test
+        run: |
+          pip install -e .  # otherwise we'll be stuck with the cached version
+          pip install pytest
+        shell: bash -el {0}
+
+      - name: Pytest
+        run: |
+          pytest --tb=native
+        shell: bash -el {0}
+
+      - name: Notify Slack if failed
+        if: failure() && github.ref == 'refs/heads/main'
+        id: slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "detail": "Build: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: "https://hooks.slack.com/workflows/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"

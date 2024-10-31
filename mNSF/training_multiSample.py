@@ -390,7 +390,7 @@ class ModelTrainer(object): #goal to change this to tf.module?
                            verbose=True,num_epochs=500,
                            ptic = process_time(), wtic = time(), ckpt_freq=50, test_cvdNorm=False,
                            kernel_hp_update_freq=10, status_freq=10, chol=True,
-                           span=100, tol=1e-4, tol_norm = 0.4, pickle_freq=None, check_convergence: bool = True):
+                           span=100, tol=1e-4, tol_norm = 0.4, pickle_freq=None, check_convergence: bool = True, chunk_size=chunk_size):
     """train_step
     Dtrain, Dval : tensorflow Datasets produced by prepare_datasets_tf func
     ckpt_mgr must store at least 2 checkpoints (max_to_keep)
@@ -432,7 +432,7 @@ class ModelTrainer(object): #goal to change this to tf.module?
         Dtrain_ksample = list_Dtrain[ksample]
         for D in Dtrain_ksample: #iterate through each of the batches 
           epoch_loss.update_state(list_tro[ksample].model.train_step( D, list_tro[ksample].optimizer, list_tro[ksample].optimizer_k,
-                                   Ntot=list_tro[ksample].model.delta.shape[1], chol=chol))
+                                   Ntot=list_tro[ksample].model.delta.shape[1], chol=chol, chunk_size = chunk_size))
           trl = trl + epoch_loss.result().numpy()
           #print("ksample")
           #print(ksample)
@@ -520,7 +520,7 @@ class ModelTrainer(object): #goal to change this to tf.module?
     return max(ckpt_freq*(self.epoch.numpy()//ckpt_freq - back), epoch0)
 
   def train_model(self, list_tro, list_Dtrain, list_D__, lr_reduce=0.5, maxtry=10, verbose=True,#*args,
-                  ckpt_freq=50, test_cvdNorm=False, **kwargs):
+                  ckpt_freq=50, test_cvdNorm=False, chunk_size=1, **kwargs):
     """
     See train_model_fixed_lr for args and kwargs. This method is a wrapper
     that automatically tries to adjust the learning rate
@@ -539,7 +539,7 @@ class ModelTrainer(object): #goal to change this to tf.module?
           self._train_model_fixed_lr(list_tro,list_Dtrain, list_D__, mgr, #*args,
                                       #ptic=ptic, wtic=wtic, 
                                      #verbose=verbose, 
-                                     ckpt_freq=ckpt_freq,
+                                     ckpt_freq=ckpt_freq, chunk_size=chunk_size,
                                      **kwargs)
           if self.epoch>=len(self.loss["train"])-1: break #finished training
         except (tf.errors.InvalidArgumentError,NumericalDivergenceError) as err: #cholesky failure

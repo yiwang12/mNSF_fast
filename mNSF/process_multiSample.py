@@ -277,7 +277,7 @@ def interpret_npf_v3(list_fit,list_X,S=10,**kwargs):
   """
   nsample=len(list_fit)
   for ksample in range(0,nsample):
-    Fhat_tmp = misc.t2np(list_fit[ksample].sample_latent_GP_funcs(list_X[ksample],S=S,chol=False)).T #NxL
+    Fhat_tmp = misc.t2np(list_fit[ksample].sample_latent_GP_funcs(list_X[ksample],S=S)).T #NxL
     if ksample==0:
       Fhat_c=Fhat_tmp
     else:

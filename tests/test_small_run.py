@@ -55,6 +55,7 @@ def _run(
     )
 
     factors = inpf12["factors"][:, :n_loadings]
+    print(factors)
     for k in range(n_sample):
         indices = process_multiSample.get_listSampleID(D)[k].astype(int)
         pd.DataFrame(factors[indices, :]).to_csv(output_dir / f"factors_sample{k + 1:02d}_smallData.csv")

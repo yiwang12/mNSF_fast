@@ -254,11 +254,11 @@ class ProcessFactorization(tf.Module):
       #aKa = tf.reduce_sum(tf.square(a_t_Kchol), axis=2) #LxN
       Sigma_tilde = self.Sigma_tilde #LxN
     if chol:
-      alpha_x = tfl.cholesky_solve(Kuu_chol, Kuf) #LxMxN
       N = X.shape[0]
       L = self.W.shape[1]
       mu_x = self.beta0+tfl.matmul(self.beta, X, transpose_b=True) #LxN
       Kuf = kernel.matrix(self.Z, X) #LxMxN
+      alpha_x = tfl.cholesky_solve(Kuu_chol, Kuf) #LxMxN
       Kff_diag = kernel.apply(X, X, example_ndims=1)+self.nugget #LxN
     
       mu_tilde = mu_x + tfl.matvec(alpha_x, self.delta-mu_z, transpose_a=True) #LxN
@@ -312,7 +312,7 @@ class ProcessFactorization(tf.Module):
     return qu.kl_divergence(pu) #L-vector
 
   # @tf.function
-  def elbo_avg(self, X, Y, sz=1, S=1, Ntot=None, chol=True, chunk_size=1):
+  def elbo_avg(self, X, Y, sz=1, S=1, Ntot=None, chol=True, chunksize=1):
     """
     Parameters
     ----------
@@ -346,7 +346,7 @@ class ProcessFactorization(tf.Module):
     #kl_terms is not affected by minibatching so use reduce_sum
     #print(1111)
     kl_term = tf.reduce_sum(self.eval_kl_term(mu_z, Kuu_chol))
-    Mu = self.sample_predictive_mean(X, sz=sz, S=S, kernel=ker, mu_z=mu_z, Kuu_chol=Kuu_chol, chol = chol, chunk_size = chunk_size)
+    Mu = self.sample_predictive_mean(X, sz=sz, S=S, kernel=ker, mu_z=mu_z, Kuu_chol=Kuu_chol, chol = chol, chunksize = chunksize)
     eloglik = likelihoods.lik_to_distr(self.lik, Mu, self.disp).log_prob(Y)
     return J*tf.reduce_mean(eloglik) - kl_term/Ntot
 
@@ -359,7 +359,7 @@ class ProcessFactorization(tf.Module):
     update the model's parameters.
     """
     with tf.GradientTape(persistent=True) as tape:
-      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol, chunk_size = chunk_size)
+      loss = -self.elbo_avg(D["X"], D["Y"], sz=D["sz"], S=S, Ntot=Ntot, chol=chol, chunk_size = chunk_size))
     try:
       gradients = tape.gradient(loss, self.trvars_nonkernel)
       if chol:

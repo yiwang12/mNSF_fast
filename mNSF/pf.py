@@ -206,8 +206,8 @@ class ProcessFactorization(tf.Module):
         
         # Process smaller chunk
         chunk_result = self.sample_latent_GP_funcs_onechunk(X_chunk,S=S,kernel=kernel,mu_z=mu_z,Kuu_chol=Kuu_chol,chol=chol)
-        print("chunk_result")
-        print(chunk_result)
+        print("chunk_result.shape")
+        print(chunk_result.shape)
         results.append(chunk_result)
     return tf.concat(results, axis=0)
   
@@ -261,6 +261,10 @@ class ProcessFactorization(tf.Module):
     """
     F = self.sample_latent_GP_funcs(X, S=S, kernel=kernel, mu_z=mu_z,
                                     Kuu_chol=Kuu_chol, chol=chol, chunk_size=chunk_size) #SxLxN
+    print("F.shape")
+    print(F.shape)
+    print("self.W.shape")
+    print(self.W.shape)
     if self.nonneg:
       Lam = tfl.matrix_transpose(tfl.matmul(self.W, tf.exp(F))) #SxNxJ
       if self.lik=="gau":

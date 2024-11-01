@@ -198,18 +198,26 @@ class ProcessFactorization(tf.Module):
 
   def sample_latent_GP_funcs(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True, chunk_size=1):
     N = X.shape[0]
-    results = []
-    
-    for start_idx in range(0, N, chunk_size):
-        end_idx = min(start_idx + chunk_size, N)
-        X_chunk = X[start_idx:end_idx]
-        
+    M = mu_z.shape[0]
+    #results = []
+    if kernel is None:
+      kernel = self.get_kernel()
+    if Kuu_chol is None:
+    	Kuu_chol = self.get_Kuu_chol(kernel=kernel, from_cache=(not chol))
+    size_eachChunk = (M/chunk_size * 2 + 1) // 2 / 1
+    for start_idx in range(0, chunk_size):
+        end_idx = min(start_idx + size_eachChunk, M)
+        mu_z_chunk = mu_z[start_idx:end_idx]
+        Kuu_chol_chunk = Kuu_chol[start_idx:end_idx, start_idx:end_idx]
         # Process smaller chunk
-        chunk_result = self.sample_latent_GP_funcs_onechunk(X_chunk,S=S,kernel=kernel,mu_z=mu_z,Kuu_chol=Kuu_chol,chol=chol)
+        chunk_result = self.sample_latent_GP_funcs_onechunk(X,S=S,kernel=kernel,mu_z=mu_z_chunk,Kuu_chol=Kuu_chol_chunk,chol=chol)
         print("chunk_result.shape")
         print(chunk_result.shape)
-        results.append(chunk_result)
-    return tf.concat(results, axis=2)
+        if start_idx==0:
+        	result = chunk_result
+        else:
+        	result = result + chunk_result
+    return result
   
   def sample_latent_GP_funcs_onechunk(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
     """
@@ -227,12 +235,12 @@ class ProcessFactorization(tf.Module):
     i.e. they are positive valued random functions.
     If logscale=True (default), the functions are real-valued
     """
-    if kernel is None:
-      kernel = self.get_kernel()
-    if mu_z is None:
-      mu_z = self.get_mu_z()
-    if Kuu_chol is None:
-      Kuu_chol = self.get_Kuu_chol(kernel=kernel, from_cache=(not chol))
+    #if kernel is None:
+    #  kernel = self.get_kernel()
+    #if mu_z is None:
+    #  mu_z = self.get_mu_z()
+    #if Kuu_chol is None:
+    #  Kuu_chol = self.get_Kuu_chol(kernel=kernel, from_cache=(not chol))
     N = X.shape[0]
     L = self.W.shape[1]
     mu_x = self.beta0+tfl.matmul(self.beta, X, transpose_b=True) #LxN

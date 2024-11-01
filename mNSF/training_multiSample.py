@@ -432,9 +432,9 @@ class ModelTrainer(object): #goal to change this to tf.module?
         	list_tro[ksample].model.Z=list_D__[ksample]["Z"]
         	Dtrain_ksample = list_Dtrain[ksample]
         	for D in Dtrain_ksample: #iterate through each of the batches 
-        	  epoch_loss.update_state(list_tro[ksample].model.train_step( D, list_tro[ksample].optimizer, list_tro[ksample].optimizer_k,
+        		epoch_loss.update_state(list_tro[ksample].model.train_step( D, list_tro[ksample].optimizer, list_tro[ksample].optimizer_k,
                                    Ntot=list_tro[ksample].model.delta.shape[1], chol=chol))
-          	trl = trl + epoch_loss.result().numpy()
+        	trl = trl + epoch_loss.result().numpy()
       else:
       	for ksample in range(0,nsample):
         	list_tro[ksample].model.Z=list_D__[ksample]["Z"]

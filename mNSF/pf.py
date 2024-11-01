@@ -208,7 +208,7 @@ class ProcessFactorization(tf.Module):
       kernel = self.get_kernel()
     if Kuu_chol is None:
     	Kuu_chol = self.get_Kuu_chol(kernel=kernel, from_cache=(not chol))
-    size_eachChunk = (M/chunk_size * 2 + 1) // 2 / 1
+    size_eachChunk = int(M/chunk_size * 2 + 1) // 2 / 1)
     for start_idx in range(0, chunk_size):
         end_idx = min(start_idx + size_eachChunk, M)
         print("mu_z.shape")

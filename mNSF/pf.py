@@ -211,6 +211,10 @@ class ProcessFactorization(tf.Module):
     size_eachChunk = (M/chunk_size * 2 + 1) // 2 / 1
     for start_idx in range(0, chunk_size):
         end_idx = min(start_idx + size_eachChunk, M)
+        print("mu_z.shape")
+        print(mu_z.shape)
+        print("end_idx")
+        print(end_idx)
         mu_z_chunk = mu_z[:,start_idx:end_idx]
         Kuu_chol_chunk = Kuu_chol[start_idx:end_idx, start_idx:end_idx]
         # Process smaller chunk

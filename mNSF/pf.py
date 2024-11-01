@@ -200,6 +200,10 @@ class ProcessFactorization(tf.Module):
     N = X.shape[0]
     M = mu_z.shape[0]
     #results = []
+    print("M")
+    print(M)
+    print("mu_z.shape")
+    print(mu_z.shape)
     if kernel is None:
       kernel = self.get_kernel()
     if Kuu_chol is None:

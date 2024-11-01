@@ -215,10 +215,10 @@ class ProcessFactorization(tf.Module):
         print(mu_z.shape)
         print("end_idx")
         print(end_idx)
-        mu_z_chunk = mu_z[:,start_idx:end_idx]
-        Kuu_chol_chunk = Kuu_chol[start_idx:end_idx, start_idx:end_idx]
+        #mu_z_chunk = mu_z[:,start_idx:end_idx]
+        #Kuu_chol_chunk = Kuu_chol[start_idx:end_idx, start_idx:end_idx]
         # Process smaller chunk
-        chunk_result = self.sample_latent_GP_funcs_onechunk(X,S=S,kernel=kernel,mu_z=mu_z_chunk,Kuu_chol=Kuu_chol_chunk,chol=chol)
+        chunk_result = self.sample_latent_GP_funcs_onechunk(X,start_idx=start_idx,end_idx=end_idx,S=S,kernel=kernel,mu_z=mu_z,Kuu_chol=Kuu_chol,chol=chol)
         print("chunk_result.shape")
         print(chunk_result.shape)
         if start_idx==0:
@@ -227,7 +227,7 @@ class ProcessFactorization(tf.Module):
         	result = result + chunk_result
     return result
   
-  def sample_latent_GP_funcs_onechunk(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
+  def sample_latent_GP_funcs_onechunk(self, X, start_idx, end_idx, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True):
     """
     Draw random samples of the latent variational GP function values "F"
     based on spatial coordinates X.
@@ -252,12 +252,12 @@ class ProcessFactorization(tf.Module):
     N = X.shape[0]
     L = self.W.shape[1]
     mu_x = self.beta0+tfl.matmul(self.beta, X, transpose_b=True) #LxN
-    Kuf = kernel.matrix(self.Z, X) #LxMxN
-    alpha_x = tfl.cholesky_solve(Kuu_chol, Kuf) #LxMxN
+    Kuf = kernel.matrix(self.Z[start_idx:end_idx,:], X) #LxMxN
+    alpha_x = tfl.cholesky_solve(Kuu_chol[:,start_idx:end_idx,start_idx:end_idx], Kuf[:,start_idx:end_idx,:]) #LxMxN
     Kff_diag = kernel.apply(X, X, example_ndims=1)+self.nugget #LxN
     
     mu_tilde = mu_x + tfl.matvec(alpha_x, self.delta-mu_z, transpose_a=True) #LxN
-    #compute the alpha(x_i)'(K_uu-Omega)alpha(x_i) term
+    #compute the alpha(x_i)'(K_uu-Omega)alpha(x_i) term,
     a_t_Kchol = tfl.matmul(alpha_x, Kuu_chol, transpose_a=True) #LxNxM
     aKa = tf.reduce_sum(tf.square(a_t_Kchol), axis=2) #LxN
     a_t_Omega_tril = tfl.matmul(alpha_x, self.Omega_tril, transpose_a=True) #LxNxM

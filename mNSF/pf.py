@@ -260,7 +260,7 @@ class ProcessFactorization(tf.Module):
     
     mu_tilde = mu_x + tfl.matvec(alpha_x, self.delta-mu_z, transpose_a=True) #LxN
     #compute the alpha(x_i)'(K_uu-Omega)alpha(x_i) term,
-    a_t_Kchol = tfl.matmul(alpha_x, Kuu_chol, transpose_a=True) #LxNxM
+    a_t_Kchol = tfl.matmul(alpha_x, Kuu_chol[:,start_idx:end_idx,start_idx:end_idx], transpose_a=True) #LxNxM
     aKa = tf.reduce_sum(tf.square(a_t_Kchol), axis=2) #LxN
     a_t_Omega_tril = tfl.matmul(alpha_x, self.Omega_tril, transpose_a=True) #LxNxM
     aOmega_a = tf.reduce_sum(tf.square(a_t_Omega_tril), axis=2) #LxN

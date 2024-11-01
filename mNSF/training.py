@@ -220,7 +220,7 @@ class ModelTrainer(object): #goal to change this to tf.module?
     #   return self.model.train_step(D, self.optimizer, self.optimizer_k,
     #                                S=S, Ntot=Ntr, chol=False)
     @tf.function
-    def train_step(D, chol=True,chunk_size = 100):
+    def train_step(D, chol=True,chunk_size = 2):
       # if chol: return train_step_chol(D)
       # else: return train_step_nochol(D)
       return self.model.train_step(D, self.optimizer, self.optimizer_k,

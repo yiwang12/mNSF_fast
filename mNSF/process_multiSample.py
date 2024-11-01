@@ -28,8 +28,8 @@ For more information on the mNSF method, please refer to the accompanying public
 
 # Import necessary libraries
 from tensorflow_probability import math as tm
-from mNSF import pf_multiSample,training_multiSample,pf
-from mNSF.NSF import misc,preprocess,postprocess
+from mNSF import pf_multiSample,training_multiSample
+from mNSF.NSF import misc,pf,preprocess,postprocess
 from anndata import AnnData
 from scanpy import pp
 import numpy as np
@@ -277,7 +277,7 @@ def interpret_npf_v3(list_fit,list_X,S=10,**kwargs):
   """
   nsample=len(list_fit)
   for ksample in range(0,nsample):
-    Fhat_tmp = misc.t2np(list_fit[ksample].sample_latent_GP_funcs(list_X[ksample],S=S)).T #NxL
+    Fhat_tmp = misc.t2np(list_fit[ksample].sample_latent_GP_funcs(list_X[ksample],S=S,chol=False)).T #NxL
     if ksample==0:
       Fhat_c=Fhat_tmp
     else:

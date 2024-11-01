@@ -45,7 +45,7 @@ def save_object(obj, filename):
 
 # Main function to train mNSF model
 def train_model_mNSF(list_fit_,pickle_path_,
-            list_Dtrain_,list_D_,legacy=False,test_cvdNorm=False, maxtry=10, lr=0.01,chunk_size=100, **kwargs):
+            list_Dtrain_,list_D_,legacy=False,test_cvdNorm=False, maxtry=10, lr=0.01,chunk_size=2, **kwargs):
   """
     Run model training for mNSF across multiple samples.
     

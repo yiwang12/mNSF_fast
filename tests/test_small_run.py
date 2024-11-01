@@ -42,7 +42,7 @@ def _run(
     # step 2 fit model
 
     (pp := (output_dir / "models" / "pp")).mkdir(parents=True, exist_ok=True)
-    fit = training_multiSample.train_model_mNSF(fit, pp, listDtrain, D, legacy=legacy, num_epochs=epochs, vec_batch = [False,False])
+    fit = training_multiSample.train_model_mNSF(fit, pp, listDtrain, D, legacy=legacy, num_epochs=epochs, vec_batch = [False,True])
     (output_dir / "list_fit_smallData.pkl").write_bytes(pickle.dumps(fit))
 
     # step 3 save results

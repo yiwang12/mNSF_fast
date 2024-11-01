@@ -198,7 +198,7 @@ class ProcessFactorization(tf.Module):
 
   def sample_latent_GP_funcs(self, X, S=1, kernel=None, mu_z=None, Kuu_chol=None, chol=True, chunk_size=1):
     N = X.shape[0]
-    M = mu_z.shape[0]
+    M = mu_z.shape[1]
     #results = []
     print("M")
     print(M)
@@ -211,7 +211,7 @@ class ProcessFactorization(tf.Module):
     size_eachChunk = (M/chunk_size * 2 + 1) // 2 / 1
     for start_idx in range(0, chunk_size):
         end_idx = min(start_idx + size_eachChunk, M)
-        mu_z_chunk = mu_z[start_idx:end_idx]
+        mu_z_chunk = mu_z[:,start_idx:end_idx]
         Kuu_chol_chunk = Kuu_chol[start_idx:end_idx, start_idx:end_idx]
         # Process smaller chunk
         chunk_result = self.sample_latent_GP_funcs_onechunk(X,S=S,kernel=kernel,mu_z=mu_z_chunk,Kuu_chol=Kuu_chol_chunk,chol=chol)
